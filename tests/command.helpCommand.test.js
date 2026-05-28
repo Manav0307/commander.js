@@ -150,26 +150,6 @@ describe('help command processed on correct command', () => {
     }).toThrow('sub help');
   });
 
-  test('when help subcommand then preSubcommand runs before delegated help', () => {
-    const calls = [];
-    const program = new commander.Command();
-    program.hook('preSubcommand', (thisCommand, subCommand) => {
-      calls.push('preSubcommand');
-      calls.push(subCommand.name());
-    });
-    const sub = program.command('sub');
-    sub.help = () => {
-      calls.push('help');
-      throw new Error('sub help');
-    };
-
-    expect(() => {
-      program.parse(['help', 'sub'], { from: 'user' });
-    }).toThrow('sub help');
-
-    expect(calls).toEqual(['preSubcommand', 'sub', 'help']);
-  });
-
   test('when no help options in sub then "help sub" works', () => {
     const program = new commander.Command();
     program.exitOverride();

@@ -8,7 +8,7 @@ case "$MODE" in
     node ./node_modules/jest/bin/jest.js tests/command.executableSubcommand.mock.test.js tests/command.helpCommand.test.js tests/command.parse.test.js --runInBand
     ;;
   new)
-    node ./node_modules/jest/bin/jest.js tests/command.preSubcommand_lifecycle_shipd.test.js --runInBand
+    node ./node_modules/jest/bin/jest.js tests/command.preSubcommand_lifecycle_e957e0.test.js --runInBand
     ;;
   *)
     echo "Usage: ./test.sh {base|new}" >&2

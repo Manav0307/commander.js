@@ -59,6 +59,26 @@ testOrSkipOnWindows(
   },
 );
 
+test('when executable subcommand then preSubcommand runs before spawn', () => {
+  const calls = [];
+  const mockProcess = new EventEmitter();
+  const spawnSpy = jest.spyOn(childProcess, 'spawn').mockImplementation(() => {
+    calls.push('spawn');
+    return mockProcess;
+  });
+  const program = new commander.Command();
+  program.hook('preSubcommand', () => {
+    calls.push('preSubcommand');
+  });
+  program._checkForMissingExecutable = () => {};
+  program.command('executable', 'executable description');
+
+  program.parse(['executable'], { from: 'user' });
+
+  expect(calls).toEqual(['preSubcommand', 'spawn']);
+  spawnSpy.mockRestore();
+});
+
 test('when subcommand executable fails with other error and exitOverride then return in custom wrapper', () => {
   // The existing behaviour is to just silently fail for unexpected errors, as it is happening
   // asynchronously in spawned process and client can not catch errors.

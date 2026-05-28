@@ -409,11 +409,34 @@ describe('.parse() called multiple times', () => {
     expect(subcommand.opts()).toEqual({ green: true });
   });
 
-  test('when using storeOptionsAsProperties then throw on second parse', () => {
-    const program = new commander.Command().storeOptionsAsProperties();
-    program.parse();
-    expect(() => {
-      program.parse();
-    }).toThrow();
+  test('when help subcommand then reset state before preSubcommand hook on repeated parse', () => {
+    const states = [];
+    const program = new commander.Command();
+    const subcommand = program.command('sub').option('--red');
+    subcommand.help = () => {
+      throw new Error('sub help');
+    };
+    program.hook('preSubcommand', (thisCommand, subCommand) => {
+      states.push(subCommand.opts());
+    });
+
+    for (let i = 0; i < 2; i += 1) {
+      try {
+        program.parse(['help', 'sub'], { from: 'user' });
+      } catch (err) {
+        expect(err.message).toBe('sub help');
+      }
+    }
+
+    expect(states).toEqual([{}, {}]);
+    expect(subcommand.opts()).toEqual({});
   });
+
+ test('when using storeOptionsAsProperties then throw on second parse', () => {
+  const program = new commander.Command().storeOptionsAsProperties();
+  program.parse(['node', 'test']);
+  expect(() => {
+    program.parse(['node', 'test']);
+  }).toThrow();
+});
 });
